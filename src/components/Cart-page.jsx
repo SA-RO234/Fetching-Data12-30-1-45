@@ -1,20 +1,30 @@
-import React from 'react'
-
+import axios from 'axios'
+import { CircleX } from 'lucide-react';
+import React, { useEffect, useState } from 'react'
 const Cartpage = () => {
+const [Allcart , setCart ] = useState(JSON.parse(localStorage.getItem("MyCart")) || []) ;
+const [qty , setQty ] = useState(); 
+
   return (
     <div className='w-[85%] select-none mx-auto py-[100px]' >
       <h1 className='text-[50px] font-bold text-black'>Product Shoping </h1>
       <div className="cart-container w-full flex ">
-          <div  className='w-[70%]'>
-              <div className="product-cart">
-                  <img src="" alt="" />
-                  <h2 className="price"></h2>
+          <div  className='w-[70%] flex flex-col gap-5'>
+             {
+               Allcart.map(item => (
+                  <div key={item.id} className="product-cart relative bg-gray-200 rounded-2xl px-5 py-2 flex gap-4 items-center w-[90%] h-[100px]">
+                  <img src={item.image} className='w-[100px] object-cover object-top h-full' alt="" />
+                   <h1 className='text-md font-regular'>{item.title}</h1>
+                  <h2 className="price text-red-700 text-2xl font-bold">$ {item.price}</h2>
                   <div className="qty flex items-center gap-3 ">
-                      <button>+</button>
-                      <span>5</span>
-                      <button>-</button>
+                      <button className='bg-gray-500 p-2 rounded-full px-4 text-white text-xl'>+</button>
+                      <span>{item.qty}</span>
+                      <button className='bg-gray-500  rounded-full px-[18px] cursor-pointer py-2 text-white text-xl' >-</button>
                   </div>
+                  <button type="button" className='cursor-pointer absolute  top-[-3px] right-[-3px]' ><CircleX className='text-red-700 text-[50px] ' /></button>
               </div>
+               ))
+             }
           </div>
           <div className='w-[30%] flex flex-col   border-l-3 border-black pl-5 '>
               <h1 className='text-[2em] font-bold '>Shoping Detail :</h1>

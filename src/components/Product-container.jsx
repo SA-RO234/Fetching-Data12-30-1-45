@@ -2,9 +2,13 @@ import React,{useState, useEffect} from 'react'
 import axios from 'axios';
 import Skeleton from './Skeleton';
 import { Link } from 'react-router-dom';
+import { ShoppingCart } from 'lucide-react';
 
 const Productcontainer = () => {
       const [data, setData] = useState([])
+
+       var AllProductCart = JSON.parse(localStorage.getItem("MyCart")) || [];
+
    const [loading,setLoading] = useState(true);
        useEffect(()=> async()=>{
           try{
@@ -18,9 +22,16 @@ const Productcontainer = () => {
           }
        },[]);
 
-  return (
+
+        const handleAddtocart = (product)=> {
+              AllProductCart.push({...product,qty : 1});
+              localStorage.setItem("MyCart",JSON.stringify(AllProductCart));
+        } 
+
+ return (
      <div className='container mx-auto select-none'>
-          <h1 className=' font-bold text-center pb-10 text-[100px] '>Product</h1>
+          <h1 className=' font-bold text-center pb-10 text-[100px] '>Product</h1> 
+            <Link to="/cart" className='flex gap-2 items-center  ml-[70px] bg-yellow-500 w-[100px] mb-10' ><ShoppingCart/>Cart</Link>
           <div className='Product-container flex justify-center items-center flex-wrap gap-[20px] mx-auto'>
             {
               loading ? 
@@ -41,8 +52,8 @@ const Productcontainer = () => {
                 <img src={item.image} alt="" className="img w-full h-[50%] object-top object-cover " />
                 <h1 className="title text-4xl font-bold">{item.title.slice(0,20)}</h1>
                 <p className="des">{item.description.slice(0,100)}</p>
-                <Link to="/cart" type="button" className="addtocart bg-yellow-700 rounded-2xl px-15 py-3 cursor-pointer
-                                                  text-2xl font-bold text-white">Add To Cart</Link>
+                <button  type="button" onClick={()=>handleAddtocart(item)} className="addtocart bg-yellow-700 rounded-2xl px-15 py-3 cursor-pointer
+                                                  text-2xl font-bold text-white">Add To Cart</button>
                </div>
               ))
             }
