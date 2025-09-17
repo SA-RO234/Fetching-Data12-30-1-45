@@ -4,13 +4,18 @@ import React, { useEffect, useState } from 'react'
 import Lottie from "lottie-react";
 import Backicon from "../assets/back.json";
 import { Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
 const Cartpage = () => {
 const [Allcart , setCart ] = useState(JSON.parse(localStorage.getItem("MyCart")) || []) ;
 const [Total , setTotal] = useState(0.0);
 const [qty , setQty ] = useState();
+const [totalPayment , setTotalpayment ] = useState();
+
      useEffect(()=> {
+         setCart(JSON.parse(localStorage.getItem("MyCart")) || []);
          setTotal(CalculatorTotalPrice(Allcart));
          setQty(TotalQuantity(Allcart));
+         setTotalpayment(TotalPayement(Allcart));
      },[]);
 
     const UpdateQtyIncrease = (id) =>{
@@ -23,6 +28,34 @@ const [qty , setQty ] = useState();
         setQty(TotalQuantity(Allcart));
       }
     });
+}
+
+//  Update Discrease 
+  const UpdateDiscrease = (id) =>{
+     Allcart.find((item)=>{
+       if(item.id == id ){
+           if(item.qty == 1){
+                 item.qty = 1;
+           }else{
+             item.qty-=1;
+           localStorage.setItem("MyCart" , JSON.stringify(Allcart));
+        setCart(JSON.parse(localStorage.getItem("MyCart")));
+        setTotal(CalculatorTotalPrice(Allcart));
+        setQty(TotalQuantity(Allcart));
+           }
+       }
+     })
+  }
+
+  //  Cancel Product
+  function CancelProduct (cart,id){
+   const updatecart = cart.filter((item) => item.id != id);
+    localStorage.setItem("MyCart" , JSON.stringify(updatecart));
+        setCart(updatecart);
+        setTotal(CalculatorTotalPrice(updatecart));
+        setQty(TotalQuantity(updatecart));
+        setTotalpayment(TotalPayement(updatecart))
+     toast.success("You has Cancel a Product ! ");
 }
 
   return (
@@ -42,9 +75,9 @@ const [qty , setQty ] = useState();
                   <div className="qty flex items-center gap-3 ">
                       <button onClick={()=> UpdateQtyIncrease(item.id)} className='bg-gray-500 p-0 rounded-full px-2 text-white text-xl'>+</button>
                       <span>{item.qty}</span>
-                      <button className='bg-gray-500  rounded-full px-[10px] cursor-pointer py-0 text-white text-xl' >-</button>
+                      <button onClick={()=> UpdateDiscrease(item.id) }  className='bg-gray-500  rounded-full px-[10px] cursor-pointer py-0 text-white text-xl' >-</button>
                   </div>
-                  <button type="button" className='cursor-pointer absolute  top-[-3px] right-[-3px]' ><CircleX className='text-red-700 text-[50px] ' /></button>
+                  <button onClick={()=> CancelProduct(Allcart,item.id)} type="button" className='cursor-pointer absolute  top-[-3px] right-[-3px]' ><CircleX className='text-red-700 text-[50px] ' /></button>
               </div>
                ))
              }
@@ -54,23 +87,26 @@ const [qty , setQty ] = useState();
               <p className='text-[1.5em] font-extralight'>Total : $<span>{Total}</span></p>
               <p className='text-[1.5em] font-extralight' >Tax :$<span>0.50</span></p>
               <p className='text-[1.5em] font-extralight pb-10' >Qutility: <span>{qty}</span></p> 
-              <h1 className='text-[1.7em] font-bold bg-blue-500 rounded-3xl px-10 py-3 opacity-95' >Total Payment : $<span>1000.00</span></h1>
+              <h1 className='text-[1.7em] font-bold bg-blue-500 rounded-3xl px-5 py-3 opacity-95' >Total Payment : $<span>{totalPayment}</span></h1>
           </div>
       </div>
     </div>
   )
 }
-
 export default Cartpage;
 
-
 function CalculatorTotalPrice(cart){
-      let total = cart.reduce((acc , item) => acc + item.price * item.qty , 0 + 0.50);
+      let total = cart.reduce((acc , item) => acc + item.price * item.qty , 0);
       return total.toFixed(2);
 }
-
 function TotalQuantity(cart){
     let qty = cart.reduce((acc, item) => acc + item.qty , 0);
     return qty;
 }
+ 
+function TotalPayement(cart){
+    var totalpay=  cart.reduce((acc , item) => acc + item.price * item.qty + 0.50 , 0);
+    return totalpay;
+}
+
 
